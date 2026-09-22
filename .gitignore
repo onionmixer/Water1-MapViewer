@@ -1,0 +1,5 @@
+/build/
+/output/
+/cache/
+/water1_mapviewer.user.ini
+__pycache__/
