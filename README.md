@@ -1,10 +1,13 @@
 # Water1 Map Viewer
 
-Qt5 Widgets 기반의 Water1 DOS 원본 세계지도 추출·탐색기입니다.
+A Qt5 Widgets tool that extracts and explores the world map of the original Water1 (Uncharted Waters) DOS release.
 
-현재 구현은 원본 데이터 경로 설정/검증, 단일 세계지도 PNG 및 JSON/manifest 생성, 생성 package의
-기본 지도·항구 marker·항구 grid·클릭 좌표 탐색과 원본 `SAVE.DAT`의 활성 보물 위치 overlay까지 포함합니다.
-원본 파일은 항상 읽기 전용으로 검사합니다.
+The current implementation covers configuring and validating the original data directory; generating a
+single world-map PNG together with JSON/manifest files; browsing a generated package with the base map,
+port markers, port grid, and click-to-inspect coordinates; and overlaying the active treasure locations
+from an original `SAVE.DAT`. Original files are always inspected read-only.
+
+![Water1 Map Viewer: the Mediterranean around Genoa with port markers, longitude/latitude rulers, the port details panel, and the Ports table](screenshot_mapviewer.png)
 
 ## Build
 
@@ -14,7 +17,7 @@ cmake --build build
 ./build/Water1_MapViewer
 ```
 
-Qt5 Core, Gui, Widgets 개발 패키지가 필요합니다.
+Requires the Qt5 Core, Gui, and Widgets development packages.
 
 ## Tests and verification
 
@@ -32,24 +35,25 @@ large-memory benchmark is opt-in; see [docs/benchmark-baseline.md](docs/benchmar
 
 ## Default configuration
 
-[`water1_mapviewer.ini`](water1_mapviewer.ini)의 `paths/original_data_directory`와
-`paths/output_directory`가 각각 기본 원본 데이터·생성 output 경로입니다. 상대 경로는 설정 파일이
-있는 디렉터리를 기준으로 해석합니다. 기본값 `../water1eng`과 `output`은 각각 workspace의 원본
-데이터와 `Water1_MapViewer/output/`을 가리킵니다. 메뉴에서 새 경로를 선택하면 사용자 설정에
-저장되며, 그 값이 기본 설정 파일보다 우선합니다. 창 크기와 좌/우·상/하 splitter 크기, 마지막으로
-연 package와 `SAVE.DAT` 경로는 기본 파일을 변경하지 않고 같은 디렉터리의
-`water1_mapviewer.user.ini`에 저장되어 다음 실행 때 복원됩니다.
+In [`water1_mapviewer.ini`](water1_mapviewer.ini), `paths/original_data_directory` and
+`paths/output_directory` set the default original-data and generated-output paths. Relative paths are
+resolved against the directory that contains the configuration file. The defaults, `../water1eng` and
+`output`, point to the workspace's original data and to `Water1_MapViewer/output/`. A path chosen from the
+menu is saved to the user settings and takes precedence over the default configuration file. The window
+size, the left/right and top/bottom splitter sizes, and the last opened package and `SAVE.DAT` paths are
+saved to `water1_mapviewer.user.ini` in the same directory, without modifying the default file, and are
+restored on the next launch.
 
-`[automation]`의 `open_generated_map_package=true`이면 마지막으로 성공한 `world_map.json`을,
-없으면 현재 profile의 기본 output package를 시작 시 자동으로 엽니다. 이어서
-`auto_load_optional_save_data=true` 및 유효한 `optional_save_data_path`/저장된 SAVE.DAT 경로가
-있으면 읽기 전용으로 불러옵니다. 파일 존재, package hash/schema, SAVE.DAT 구조 검증 중 하나라도
-실패하면 경고 대화상자 없이 해당 자동 작업만 건너뜁니다.
+When `[automation]` has `open_generated_map_package=true`, the viewer opens the last successfully generated
+`world_map.json` at startup, or the current profile's default output package if there is none. Then, if
+`auto_load_optional_save_data=true` and a valid `optional_save_data_path` or saved `SAVE.DAT` path exists,
+it loads that file read-only. If any check fails (file existence, package hash/schema, or `SAVE.DAT`
+structure), only that automatic step is skipped, without a warning dialog.
 
 ## Original data directory
 
-메뉴 **File → Set Original Data Directory…**에서 원본 데이터가 들어 있는 디렉터리를 고릅니다.
-현재 검증하는 필수 파일은 다음과 같습니다.
+Choose the directory that contains the original data with **File → Set Original Data Directory…**.
+The following required files are currently validated:
 
 - `NEWGAME.DAT` (70,677 bytes)
 - `MAP.PUT` (9,072 bytes)
@@ -57,11 +61,11 @@ large-memory benchmark is opt-in; see [docs/benchmark-baseline.md](docs/benchmar
 - `COLOR.CIM` (2,568 bytes; original 24×12 port marker sprite)
 - `MAIN.EXE` (known English profile: 338,277 bytes)
 
-파일 이름은 대소문자를 구분하지 않아 찾지만, 같은 이름의 대소문자 변형이 둘 이상 있으면
-모호한 입력으로 거부합니다. 경로와 검증 결과만 사용자 설정에 저장하며 원본 파일은 수정하지
-않습니다.
+File names are matched case-insensitively, but if more than one case variant of the same name exists,
+the input is rejected as ambiguous. Only the path and the validation result are stored in the user
+settings; original files are never modified.
 
-전체 설계와 후속 단계는 [PLAN_WATER1_MAPVIEWER.md](PLAN_WATER1_MAPVIEWER.md)를 참조하세요.
+See [PLAN_WATER1_MAPVIEWER.md](PLAN_WATER1_MAPVIEWER.md) for the overall design and later phases.
 
 ## Reproducible validation and generation
 
@@ -119,9 +123,10 @@ An existing package can be integrity-checked without opening the main window:
 ./build/Water1_MapViewer --inspect-save ../water1eng/SAVE.DAT
 ```
 
-뷰어에서 생성 package를 연 뒤 **File → Set Optional SAVE.DAT…**로 원본 저장 파일을 선택하면,
-유효 슬롯 중 활성 상태인 보물 퀘스트의 위치와 이름·가치를 읽어 파란 marker와 보물 탭에 표시합니다.
-이 동작은 저장 파일을 변경하지 않습니다.
+After opening a generated package in the viewer, choose an original save file with
+**File → Set Optional SAVE.DAT…**. The viewer reads the location, name, and value of each active treasure
+quest in the valid slots and shows them as blue markers and in the Treasures tab. This does not modify the
+save file.
 
 The baseline profile and terrain LUT/palette provenance are documented in
 [docs/data-provenance.md](docs/data-provenance.md); market-price reconstruction is documented in
