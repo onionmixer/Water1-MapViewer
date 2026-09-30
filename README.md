@@ -132,3 +132,9 @@ The baseline profile and terrain LUT/palette provenance are documented in
 [docs/data-provenance.md](docs/data-provenance.md); market-price reconstruction is documented in
 [docs/market-prices.md](docs/market-prices.md), and fleet-status reconstruction is documented in
 [docs/fleet-status.md](docs/fleet-status.md).
+
+## License
+
+The viewer source is released under the MIT License (see [LICENSE](LICENSE)).
+Original game data is not covered and is not included; you need your own copy of the original DOS release.
+The map imagery in the screenshot is rendered from that original data.
